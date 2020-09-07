@@ -1,18 +1,24 @@
 <template>
   <div id="app">
     <img alt="Vue logo" src="./assets/logo.png" />
-    <HelloWorld msg="Welcome to Your Vue.js App" />
+    <p>
+      count:
+      <button @click="$store.commit('ADD', 1)">{{ $store.state.count }}</button>
+    </p>
+    <p>
+      async count:
+      <button @click="$store.dispatch('ADD', 1)">{{ $store.state.count }}</button>
+    </p>
+    <p>
+      double count:
+      <button @click="$store.commit('DOUBLE')">{{ $store.state.count }}</button>
+    </p>
   </div>
 </template>
 
 <script>
-import HelloWorld from "./components/HelloWorld.vue";
-
 export default {
-  name: "App",
-  components: {
-    HelloWorld
-  }
+  name: 'App'
 };
 </script>
 
