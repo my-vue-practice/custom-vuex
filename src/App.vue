@@ -20,7 +20,11 @@
 
 <script>
 export default {
-  name: 'App'
+  name: 'App',
+  mounted() {
+    this.$store.state = {};
+    console.log(this.$store.state);
+  }
 };
 </script>
 
