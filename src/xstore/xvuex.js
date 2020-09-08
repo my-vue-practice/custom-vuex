@@ -13,9 +13,18 @@ class XStore {
     });
     this._mutations = options.mutations;
     this._actions = options.actions;
+    this._getters = options.getters;
     // 纠正this指向
     this.commit = this.commit.bind(this);
     this.dispatch = this.dispatch.bind(this);
+
+    // update getters
+    this.getters = {};
+    Object.keys(this._getters).forEach(key => {
+      Object.defineProperty(this.getters, key, {
+        get: () => this._getters[key](this.state, this.getters)
+      });
+    });
   }
   commit(type, payload) {
     this._mutations[type] && this._mutations[type](this.state, payload);

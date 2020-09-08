@@ -13,6 +13,8 @@
       double count:
       <button @click="$store.commit('DOUBLE')">{{ $store.state.count }}</button>
     </p>
+    <p>getters doubleCount: {{ $store.getters.doubleCount }}</p>
+    <p>getters doubleDoubleCount: {{ $store.getters.doubleDoubleCount }}</p>
   </div>
 </template>
 
