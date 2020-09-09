@@ -60,8 +60,47 @@ function install(_Vue) {
     }
   });
 }
+/**
+ *
+ * @param {object} options
+ * @example
+ * exp1:
+ * {
+ *  a: state => state.a,
+ *  b: (state, getters) => state.b + getters.c
+ * }
+ * exp2:
+ * ['a', 'b']
+ */
+function mapState(options) {
+  let obj = {};
+  if (Array.isArray(options)) {
+    // 数组
+    options.forEach(key => {
+      obj[key] = function() {
+        return this.$store.state[key];
+      };
+    });
+  } else if (options !== null && typeof options === 'object') {
+    // object
+    Object.keys(options).forEach(key => {
+      obj[key] = function() {
+        const v = options[key];
+        const st = this.$store.state;
+        const gt = this.$store.getters;
+        // 巧妙的运用this获取组件实例，从而从实例上面获取$store
+        return typeof v === 'string' ? st[v] : v.call(this, st, gt);
+      };
+    });
+  }
+  console.log('[mapState obj]', obj);
+  return obj;
+}
+
+export { mapState };
 
 export default {
   Store: XStore,
-  install
+  install,
+  mapState
 };

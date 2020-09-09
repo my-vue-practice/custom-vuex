@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png" />
+    <img width="100" alt="Vue logo" src="./assets/logo.png" />
     <p>
       count:
       <button @click="$store.commit('ADD', 1)">{{ $store.state.count }}</button>
@@ -13,18 +13,37 @@
       double count:
       <button @click="$store.commit('DOUBLE')">{{ $store.state.count }}</button>
     </p>
+    <br />
+    <h3>getters data:</h3>
     <p>getters doubleCount: {{ $store.getters.doubleCount }}</p>
     <p>getters doubleDoubleCount: {{ $store.getters.doubleDoubleCount }}</p>
+    <br />
+    <h3>computed data:</h3>
+    <!-- mapState数组形式 -->
+    <p>count: {{ count }}</p>
+    <!-- mapState对象形式 -->
+    <!-- <p>computedCount: {{ computedCount }}</p>
+    <p>computedCountAddGettersDoubleCount: {{ computedCountAddGettersDoubleCount }}</p> -->
   </div>
 </template>
 
 <script>
+import { mapState } from './xstore/xvuex';
 export default {
   name: 'App',
   mounted() {
     this.$store.state = {};
     console.log(this.$store.state);
-  }
+  },
+  // 数组形式
+  computed: mapState(['count'])
+  // 对象形式
+  // computed: mapState({
+  //   // computedCount: state => state.count,
+  //   // 上面简写形式：
+  //   computedCount: 'count',
+  //   computedCountAddGettersDoubleCount: (state, getters) => state.count + getters.doubleCount
+  // })
 };
 </script>
 
