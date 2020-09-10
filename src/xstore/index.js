@@ -41,6 +41,9 @@ export default new Vuex.Store({
     ADD(state, payload) {
       state.count += payload;
     },
+    MINUS(state, payload) {
+      state.count -= payload.amount;
+    },
     DOUBLE(state) {
       state.count *= 2;
     }

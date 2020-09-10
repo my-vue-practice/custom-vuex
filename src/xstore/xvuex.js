@@ -41,11 +41,34 @@ class XStore {
   set state(v) {
     console.warn('[xvuex warn] use commit(mutation) for update state!');
   }
+  /**
+   * 提交mutation
+   * @example
+   * 1. commit(type, payload)
+   * 2. commit({type, payload})
+   */
   commit(type, payload) {
+    // if (typeof type === 'string') {
+    //   this._mutations[type] && this._mutations[type](this.state, payload);
+    // } else
+    if (type !== null && typeof type === 'object') {
+      payload = type;
+      type = payload.type;
+    }
     this._mutations[type] && this._mutations[type](this.state, payload);
   }
 
+  /**
+   * 异步提交mutation
+   * @example
+   * 1. dispatch(type, payload)
+   * 2. dispatch({type, payload})
+   */
   dispatch(type, payload) {
+    if (type !== null && typeof type === 'object') {
+      payload = type;
+      type = payload.type;
+    }
     this._actions[type] && this._actions[type](this, payload);
   }
 }
