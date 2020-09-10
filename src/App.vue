@@ -15,8 +15,9 @@
     </p>
     <br />
     <h3>getters data:</h3>
-    <p>getters doubleCount: {{ $store.getters.doubleCount }}</p>
-    <p>getters doubleDoubleCount: {{ $store.getters.doubleDoubleCount }}</p>
+    <p>getters property doubleCount: {{ $store.getters.doubleCount }}</p>
+    <p>getters property doubleDoubleCount: {{ $store.getters.doubleDoubleCount }}</p>
+    <p>getters function getTodoById: {{ todoText }}</p>
     <br />
     <h3>computed data:</h3>
     <!-- mapState数组形式 -->
@@ -31,9 +32,15 @@
 import { mapState } from './xstore/xvuex';
 export default {
   name: 'App',
+  data() {
+    return {
+      todoText: ''
+    };
+  },
   mounted() {
     this.$store.state = {};
     console.log(this.$store.state);
+    this.todoText = this.$store.getters.getTodoById(2).text;
   },
   // 数组形式
   computed: mapState(['count'])
