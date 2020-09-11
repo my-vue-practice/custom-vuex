@@ -1,8 +1,8 @@
 <template>
   <div id="app">
     <img width="100" alt="Vue logo" src="./assets/logo.png" /><br />
-    <button @click="$store.commit('ADD', 1)">+1</button>&nbsp;&nbsp;
-    <button @click="$store.commit({ type: 'MINUS', amount: 1 })">-1</button>&nbsp;&nbsp;
+    <button @click="add(1)">+1</button>&nbsp;&nbsp;
+    <button @click="minus({ amount: 1 })">-1</button>&nbsp;&nbsp;
     <button @click="$store.dispatch('ADD', 1)">async +1</button>&nbsp;&nbsp;
     <button @click="$store.commit('DOUBLE')">*2</button>
     <p>{{ $store.state.count }}</p>
@@ -13,6 +13,7 @@
     <!-- mapState对象形式 -->
     <!-- <p>computedCount: {{ computedCount }}</p>
     <p>computedCountAddGettersDoubleCount: {{ computedCountAddGettersDoubleCount }}</p> -->
+    <p>todoText2: {{ todoText2 }}</p>
     <br />
     <h3>getters data:</h3>
     <p>getters property doubleCount: {{ $store.getters.doubleCount }}</p>
@@ -22,7 +23,7 @@
 </template>
 
 <script>
-import { mapState } from './xstore/xvuex';
+import { mapState, mapMutations } from './xstore/xvuex';
 export default {
   name: 'App',
   data() {
@@ -35,8 +36,22 @@ export default {
     console.log(this.$store.state);
     this.todoText = this.$store.getters.getTodoById(2).text;
   },
+  methods: {
+    ...mapMutations({
+      add: 'ADD',
+      minus: 'MINUS'
+    }),
+    test() {
+      console.log('test');
+    }
+  },
   // 数组形式
-  computed: mapState(['count'])
+  computed: {
+    ...mapState(['count']),
+    todoText2() {
+      return this.todoText + '@@@';
+    }
+  }
   // 对象形式
   // computed: mapState({
   //   // computedCount: state => state.count,

@@ -100,13 +100,16 @@ function mapState(options) {
   if (Array.isArray(options)) {
     // 数组
     options.forEach(key => {
+      // 为了this指向当前组件实例，这里不能用箭头函数。
       obj[key] = function() {
+        // 巧妙的运用this获取组件实例，从而从实例上面获取$store
         return this.$store.state[key];
       };
     });
   } else if (options !== null && typeof options === 'object') {
     // object
     Object.keys(options).forEach(key => {
+      // 为了this指向当前组件实例，这里不能用箭头函数。
       obj[key] = function() {
         const v = options[key];
         const st = this.$store.state;
@@ -120,7 +123,36 @@ function mapState(options) {
   return obj;
 }
 
-export { mapState };
+/**
+ *
+ * @param {object} options
+ * @example
+ * exp1:
+ * {
+ *  funcA: 'a',
+ *  funcB: 'b'
+ * }
+ * exp2:
+ * ['a', 'b']
+ */
+function mapMutations(options) {
+  let obj = {};
+  let opts = {};
+  if (Array.isArray(options)) {
+    options.forEach(k => (opts[k] = k));
+  }
+  if (options !== null && typeof options === 'object') {
+    opts = { ...options };
+  }
+  Object.keys(opts).forEach(key => {
+    obj[key] = function(payload) {
+      this.$store.commit(opts[key], payload);
+    };
+  });
+  return obj;
+}
+
+export { mapState, mapMutations };
 
 export default {
   Store: XStore,
