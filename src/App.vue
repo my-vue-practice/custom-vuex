@@ -1,12 +1,12 @@
 <template>
   <div id="app">
     <img width="100" alt="Vue logo" src="./assets/logo.png" /><br />
-    <button @click="$store.commit('ADD', 1)">+1</button>&nbsp;&nbsp;
+    <button @click="$store.commit('add', 1)">+1</button>&nbsp;&nbsp;
     <button @click="add(1)">mapMutations +1</button>&nbsp;&nbsp;
     <button @click="minus({ amount: 1 })">-1</button>&nbsp;&nbsp;
-    <button @click="$store.dispatch('ADD_ASYNC', 1)">async +1</button>&nbsp;&nbsp;
+    <button @click="$store.dispatch('addAsync', 1)">async +1</button>&nbsp;&nbsp;
     <button @click="addAsync(1)">mapActions async +1</button>&nbsp;&nbsp;
-    <button @click="$store.commit('DOUBLE')">*2</button>
+    <button @click="$store.commit('double')">*2</button>
     <p>{{ $store.state.count }}</p>
     <br />
     <h3>computed data:</h3>
@@ -25,6 +25,7 @@
 </template>
 
 <script>
+// import { mapState, mapMutations, mapActions } from 'vuex';
 import { mapState, mapMutations, mapActions } from './xstore/xvuex';
 export default {
   name: 'App',
@@ -34,18 +35,17 @@ export default {
     };
   },
   mounted() {
-    this.$store.state = {};
-    console.log(this.$store.state);
+    // this.$store.state = {};
+    // console.log(this.$store.state);
     this.todoText = this.$store.getters.getTodoById(2).text;
   },
   methods: {
-    ...mapMutations({
-      add: 'ADD', // add(1) => this.$store.commit('ADD', 1)
-      minus: 'MINUS'
-    }),
-    ...mapActions({
-      addAsync: 'ADD_ASYNC' // addAsync(1) => this.$store.dispatch('ADD_ASYNC', 1)
-    }),
+    ...mapMutations(['add', 'minus']),
+    // ...mapMutations({
+    //   add: 'add', // add(1) => this.$store.commit('add', 1)
+    //   minus: 'minus'
+    // }),
+    ...mapActions(['addAsync']), // addAsync(1) => this.$store.dispatch('addAsync', 1)
     test() {
       console.log('test');
     }

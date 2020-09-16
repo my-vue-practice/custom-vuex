@@ -55,7 +55,7 @@ class XStore {
       payload = type;
       type = payload.type;
     }
-    this._mutations[type] && this._mutations[type](this.state, payload);
+    return this._mutations[type] && this._mutations[type](this.state, payload);
   }
 
   /**
@@ -69,7 +69,7 @@ class XStore {
       payload = type;
       type = payload.type;
     }
-    this._actions[type] && this._actions[type](this, payload);
+    return this._actions[type] && this._actions[type](this, payload);
   }
 }
 
@@ -163,16 +163,14 @@ function mapFuncWrap(func) {
     let obj = {};
     let opts = {};
     if (Array.isArray(options)) {
-      options.forEach(k => (opts[k] = k));
-    }
-    if (options !== null && typeof options === 'object') {
+      options.forEach(t => (opts[t] = t));
+    } else if (options !== null && typeof options === 'object') {
       opts = { ...options };
     }
-
-    Object.keys(opts).forEach(key => {
-      obj[key] = function(payload) {
-        // this.$store.dispatch(opts[key], payload);
-        func.call(this, opts[key], payload);
+    Object.keys(opts).forEach(type => {
+      obj[type] = function(payload) {
+        // this.$store.dispatch(type, payload);
+        func.call(this, type, payload);
       };
     });
 
@@ -212,6 +210,7 @@ const mapMutations = mapFuncWrap(function(type, payload) {
   this.$store.commit(type, payload);
 });
 
+// 使用mapXXX辅助函数进行映射前，必须先将store对象注入到根节点上。这样才能使用this.$store
 export { mapState, mapMutations, mapActions };
 
 export default {

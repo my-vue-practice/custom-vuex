@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import Vuex from './xvuex';
+// import Vuex from 'vuex';
 
 Vue.use(Vuex);
 
@@ -38,20 +39,20 @@ export default new Vuex.Store({
     }
   },
   mutations: {
-    ADD(state, payload) {
+    add(state, payload) {
       state.count += payload;
     },
-    MINUS(state, payload) {
+    minus(state, payload) {
       state.count -= payload.amount;
     },
-    DOUBLE(state) {
+    double(state) {
       state.count *= 2;
     }
   },
   actions: {
-    ADD_ASYNC({ commit }, payload) {
+    addAsync({ commit }, payload) {
       setTimeout(() => {
-        commit('ADD', payload);
+        commit('add', payload);
       }, 1000);
     }
   },
