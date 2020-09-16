@@ -123,40 +123,6 @@ function mapState(options) {
   return obj;
 }
 
-// function mapMutations(options) {
-//   let obj = {};
-//   let opts = {};
-//   if (Array.isArray(options)) {
-//     options.forEach(k => (opts[k] = k));
-//   }
-//   if (options !== null && typeof options === 'object') {
-//     opts = { ...options };
-//   }
-//   Object.keys(opts).forEach(key => {
-//     obj[key] = function(payload) {
-//       this.$store.commit(opts[key], payload);
-//     };
-//   });
-//   return obj;
-// }
-
-// function mapActions(options) {
-//   let obj = {};
-//   let opts = {};
-//   if (Array.isArray(options)) {
-//     options.forEach(k => (opts[k] = k));
-//   }
-//   if (options !== null && typeof options === 'object') {
-//     opts = { ...options };
-//   }
-//   Object.keys(opts).forEach(key => {
-//     obj[key] = function(payload) {
-//       this.$store.dispatch(opts[key], payload);
-//     };
-//   });
-//   return obj;
-// }
-
 // 柯里化 curring
 function mapFuncWrap(func) {
   return options => {
