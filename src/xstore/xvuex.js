@@ -123,6 +123,63 @@ function mapState(options) {
   return obj;
 }
 
+// function mapMutations(options) {
+//   let obj = {};
+//   let opts = {};
+//   if (Array.isArray(options)) {
+//     options.forEach(k => (opts[k] = k));
+//   }
+//   if (options !== null && typeof options === 'object') {
+//     opts = { ...options };
+//   }
+//   Object.keys(opts).forEach(key => {
+//     obj[key] = function(payload) {
+//       this.$store.commit(opts[key], payload);
+//     };
+//   });
+//   return obj;
+// }
+
+// function mapActions(options) {
+//   let obj = {};
+//   let opts = {};
+//   if (Array.isArray(options)) {
+//     options.forEach(k => (opts[k] = k));
+//   }
+//   if (options !== null && typeof options === 'object') {
+//     opts = { ...options };
+//   }
+//   Object.keys(opts).forEach(key => {
+//     obj[key] = function(payload) {
+//       this.$store.dispatch(opts[key], payload);
+//     };
+//   });
+//   return obj;
+// }
+
+// 柯里化 curring
+function mapFuncWrap(func) {
+  return options => {
+    let obj = {};
+    let opts = {};
+    if (Array.isArray(options)) {
+      options.forEach(k => (opts[k] = k));
+    }
+    if (options !== null && typeof options === 'object') {
+      opts = { ...options };
+    }
+
+    Object.keys(opts).forEach(key => {
+      obj[key] = function(payload) {
+        // this.$store.dispatch(opts[key], payload);
+        func.call(this, opts[key], payload);
+      };
+    });
+
+    return obj;
+  };
+}
+
 /**
  *
  * @param {object} options
@@ -135,24 +192,27 @@ function mapState(options) {
  * exp2:
  * ['a', 'b']
  */
-function mapMutations(options) {
-  let obj = {};
-  let opts = {};
-  if (Array.isArray(options)) {
-    options.forEach(k => (opts[k] = k));
-  }
-  if (options !== null && typeof options === 'object') {
-    opts = { ...options };
-  }
-  Object.keys(opts).forEach(key => {
-    obj[key] = function(payload) {
-      this.$store.commit(opts[key], payload);
-    };
-  });
-  return obj;
-}
+const mapActions = mapFuncWrap(function(type, payload) {
+  this.$store.dispatch(type, payload);
+});
 
-export { mapState, mapMutations };
+/**
+ *
+ * @param {object} options
+ * @example
+ * exp1:
+ * {
+ *  funcA: 'a',
+ *  funcB: 'b'
+ * }
+ * exp2:
+ * ['a', 'b']
+ */
+const mapMutations = mapFuncWrap(function(type, payload) {
+  this.$store.commit(type, payload);
+});
+
+export { mapState, mapMutations, mapActions };
 
 export default {
   Store: XStore,

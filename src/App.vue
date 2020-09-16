@@ -1,17 +1,19 @@
 <template>
   <div id="app">
     <img width="100" alt="Vue logo" src="./assets/logo.png" /><br />
-    <button @click="add(1)">+1</button>&nbsp;&nbsp;
+    <button @click="$store.commit('ADD', 1)">+1</button>&nbsp;&nbsp;
+    <button @click="add(1)">mapMutations +1</button>&nbsp;&nbsp;
     <button @click="minus({ amount: 1 })">-1</button>&nbsp;&nbsp;
-    <button @click="$store.dispatch('ADD', 1)">async +1</button>&nbsp;&nbsp;
+    <button @click="$store.dispatch('ADD_ASYNC', 1)">async +1</button>&nbsp;&nbsp;
+    <button @click="addAsync(1)">mapActions async +1</button>&nbsp;&nbsp;
     <button @click="$store.commit('DOUBLE')">*2</button>
     <p>{{ $store.state.count }}</p>
     <br />
     <h3>computed data:</h3>
     <!-- mapState数组形式 -->
-    <p>count: {{ count }}</p>
+    <p>mapState count: {{ count }}</p>
     <!-- mapState对象形式 -->
-    <!-- <p>computedCount: {{ computedCount }}</p>
+    <!-- <p>mapState computedCount: {{ computedCount }}</p>
     <p>computedCountAddGettersDoubleCount: {{ computedCountAddGettersDoubleCount }}</p> -->
     <p>todoText2: {{ todoText2 }}</p>
     <br />
@@ -23,7 +25,7 @@
 </template>
 
 <script>
-import { mapState, mapMutations } from './xstore/xvuex';
+import { mapState, mapMutations, mapActions } from './xstore/xvuex';
 export default {
   name: 'App',
   data() {
@@ -38,8 +40,11 @@ export default {
   },
   methods: {
     ...mapMutations({
-      add: 'ADD',
+      add: 'ADD', // add(1) => this.$store.commit('ADD', 1)
       minus: 'MINUS'
+    }),
+    ...mapActions({
+      addAsync: 'ADD_ASYNC' // addAsync(1) => this.$store.dispatch('ADD_ASYNC', 1)
     }),
     test() {
       console.log('test');

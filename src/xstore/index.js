@@ -49,7 +49,7 @@ export default new Vuex.Store({
     }
   },
   actions: {
-    ADD({ commit }, payload) {
+    ADD_ASYNC({ commit }, payload) {
       setTimeout(() => {
         commit('ADD', payload);
       }, 1000);
