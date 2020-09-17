@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <img width="100" alt="Vue logo" src="./assets/logo.png" /><br />
+    <img width="60" alt="Vue logo" src="./assets/logo.png" /><br />
     <button @click="$store.commit('add', 1)">+1</button>&nbsp;&nbsp;
     <button @click="add(1)">mapMutations +1</button>&nbsp;&nbsp;
     <button @click="minus({ amount: 1 })">-1</button>&nbsp;&nbsp;
@@ -21,6 +21,10 @@
     <p>getters property doubleCount: {{ $store.getters.doubleCount }}</p>
     <p>getters property doubleDoubleCount: {{ $store.getters.doubleDoubleCount }}</p>
     <p>getters function getTodoById: {{ todoText }}</p>
+    <hr />
+    <h3>module A</h3>
+    <button @click="$store.commit('moduleA/add', 1)">moduleA add +1</button>
+    <p>moduleA.count: {{ $store.state.moduleA.count }}</p>
   </div>
 </template>
 
@@ -36,7 +40,7 @@ export default {
   },
   mounted() {
     // this.$store.state = {};
-    // console.log(this.$store.state);
+    console.log('[mounted]', this.$store.state);
     this.todoText = this.$store.getters.getTodoById(2).text;
   },
   methods: {

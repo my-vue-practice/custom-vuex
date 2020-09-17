@@ -1,5 +1,22 @@
-let Vue;
+/** 工具函数 */
+const Utils = {
+  isObject(obj) {
+    return obj !== null && typeof obj === 'object';
+  }
+};
 
+const Helpers = {
+  unifyObjectStyle(type, payload, options) {
+    if (Utils.isObject(type) && type.type) {
+      options = payload;
+      payload = type;
+      type = type.type;
+    }
+    return { type, payload, options };
+  }
+};
+
+let Vue;
 class XStore {
   constructor(options) {
     console.log('[options]', options);
@@ -11,20 +28,25 @@ class XStore {
     //     return options.state;
     //   }
     // });
-    // 将state设置更加严格，防止用户直接修改state
-    this._vm = new Vue({
-      data() {
-        return {
-          $$state: options.state
-        };
-      }
-    });
+    // // 将state设置更加严格，防止用户直接修改state
+    // this._vm = new Vue({
+    //   data() {
+    //     return {
+    //       $$state: options.state
+    //     };
+    //   }
+    // });
+
+    this._options = options;
     this._mutations = options.mutations;
     this._actions = options.actions;
     this._getters = options.getters;
+    this._modules = options.modules;
     // 纠正this指向
     this.commit = this.commit.bind(this);
     this.dispatch = this.dispatch.bind(this);
+
+    this._initState();
 
     // update getters
     this.getters = {};
@@ -32,6 +54,33 @@ class XStore {
       Object.defineProperty(this.getters, key, {
         get: () => this._getters[key](this.state, this.getters)
       });
+    });
+  }
+
+  /** state等于rootState加modulesState */
+  _initState() {
+    let rootState = this._options.state;
+    rootState = (typeof rootState === 'function' ? rootState() : rootState) || {};
+
+    const modulesState = {};
+    if (Utils.isObject(this._modules)) {
+      Object.keys(this._modules).forEach(key => {
+        console.log('key>>', key);
+        const state = this._modules[key].state;
+        modulesState[key] = (typeof state === 'function' ? state() : state) || {};
+      });
+    }
+
+    // 将state设置更加严格，防止用户直接修改state
+    this._vm = new Vue({
+      data() {
+        return {
+          $$state: {
+            ...rootState,
+            ...modulesState
+          }
+        };
+      }
     });
   }
 
@@ -47,14 +96,9 @@ class XStore {
    * 1. commit(type, payload)
    * 2. commit({type, payload})
    */
-  commit(type, payload) {
-    // if (typeof type === 'string') {
-    //   this._mutations[type] && this._mutations[type](this.state, payload);
-    // } else
-    if (type !== null && typeof type === 'object') {
-      payload = type;
-      type = payload.type;
-    }
+  commit(_type, _payload, _options) {
+    const { type, payload } = Helpers.unifyObjectStyle(_type, _payload, _options);
+
     return this._mutations[type] && this._mutations[type](this.state, payload);
   }
 
@@ -64,11 +108,8 @@ class XStore {
    * 1. dispatch(type, payload)
    * 2. dispatch({type, payload})
    */
-  dispatch(type, payload) {
-    if (type !== null && typeof type === 'object') {
-      payload = type;
-      type = payload.type;
-    }
+  dispatch(_type, _payload, _options) {
+    const { type, payload } = Helpers.unifyObjectStyle(_type, _payload, _options);
     return this._actions[type] && this._actions[type](this, payload);
   }
 }
@@ -77,8 +118,19 @@ function install(_Vue) {
   Vue = _Vue;
   Vue.mixin({
     beforeCreate() {
-      if (this.$options.store) {
-        Vue.prototype.$store = this.$options.store;
+      // if (this.$options.store) {
+      //   Vue.prototype.$store = this.$options.store;
+      // }
+
+      // 实现优化
+      const options = this.$options;
+      const store = options.store;
+      if (store) {
+        // 组件内部设定了store,则优先使用组件内部的store
+        this.$store = typeof store === 'function' ? store() : store;
+      } else if (options.parent && options.parent.$store) {
+        // 组件内部没有设定store,则从根App.vue下继承$store方法
+        this.$store = options.parent.$store;
       }
     }
   });
@@ -106,7 +158,7 @@ function mapState(options) {
         return this.$store.state[key];
       };
     });
-  } else if (options !== null && typeof options === 'object') {
+  } else if (Utils.isObject(options)) {
     // object
     Object.keys(options).forEach(key => {
       // 为了this指向当前组件实例，这里不能用箭头函数。
@@ -130,7 +182,7 @@ function mapFuncWrap(func) {
     let opts = {};
     if (Array.isArray(options)) {
       options.forEach(t => (opts[t] = t));
-    } else if (options !== null && typeof options === 'object') {
+    } else if (Utils.isObject(options)) {
       opts = { ...options };
     }
     Object.keys(opts).forEach(type => {

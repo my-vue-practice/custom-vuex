@@ -40,6 +40,7 @@ export default new Vuex.Store({
   },
   mutations: {
     add(state, payload) {
+      console.log('[root]', payload);
       state.count += payload;
     },
     minus(state, payload) {
@@ -56,5 +57,38 @@ export default new Vuex.Store({
       }, 1000);
     }
   },
-  modules: {}
+  // TODO: modules实现
+  modules: {
+    /**
+     * state:
+     * {
+     *  count: 0,
+     *  todos: [],
+     *  moduleA: { count: 0 }
+     * }
+     */
+    moduleA: {
+      namespaced: true,
+      state: { count: 0 },
+      mutations: {
+        add(state, payload, rootState) {
+          console.log('[moduleA]', payload, rootState);
+          state.count += payload;
+        }
+      },
+      // 嵌套module
+      modules: {
+        moduleA2: {
+          namespaced: true,
+          state: { newCount: 0 },
+          mutations: {
+            add(state, payload, rootState) {
+              console.log('[moduleA2]', payload, rootState);
+              state.newCount += payload;
+            }
+          }
+        }
+      }
+    }
+  }
 });
