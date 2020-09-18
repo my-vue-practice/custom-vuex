@@ -1,20 +1,5 @@
-/** 工具函数 */
-const Utils = {
-  isObject(obj) {
-    return obj !== null && typeof obj === 'object';
-  }
-};
-
-const Helpers = {
-  unifyObjectStyle(type, payload, options) {
-    if (Utils.isObject(type) && type.type) {
-      options = payload;
-      payload = type;
-      type = type.type;
-    }
-    return { type, payload, options };
-  }
-};
+import { isObject } from './util';
+import ModuleCollection from './module/module-collection';
 
 let Vue;
 class XStore {
@@ -41,7 +26,8 @@ class XStore {
     this._mutations = options.mutations;
     this._actions = options.actions;
     this._getters = options.getters;
-    this._modules = options.modules;
+    this._modules = new ModuleCollection(options);
+    // this._modules = options.modules;
     // 纠正this指向
     this.commit = this.commit.bind(this);
     this.dispatch = this.dispatch.bind(this);
@@ -63,13 +49,13 @@ class XStore {
     rootState = (typeof rootState === 'function' ? rootState() : rootState) || {};
 
     const modulesState = {};
-    if (Utils.isObject(this._modules)) {
-      Object.keys(this._modules).forEach(key => {
-        console.log('key>>', key);
-        const state = this._modules[key].state;
-        modulesState[key] = (typeof state === 'function' ? state() : state) || {};
-      });
-    }
+    // if (isObject(this._modules)) {
+    //   Object.keys(this._modules).forEach(key => {
+    //     console.log('key>>', key);
+    //     const state = this._modules[key].state;
+    //     modulesState[key] = (typeof state === 'function' ? state() : state) || {};
+    //   });
+    // }
 
     // 将state设置更加严格，防止用户直接修改state
     this._vm = new Vue({
@@ -97,9 +83,17 @@ class XStore {
    * 2. commit({type, payload})
    */
   commit(_type, _payload, _options) {
-    const { type, payload } = Helpers.unifyObjectStyle(_type, _payload, _options);
+    const { type, payload } = unifyObjectStyle(_type, _payload, _options);
 
-    return this._mutations[type] && this._mutations[type](this.state, payload);
+    const typeArr = type.split('/').filter(t => t);
+    console.log('[typeArr]', typeArr);
+    if (typeArr.length > 1) {
+      // module state a/b/c
+      // TODO...
+    } else {
+      // rootState
+      return this._mutations[type] && this._mutations[type](this.state, payload);
+    }
   }
 
   /**
@@ -109,7 +103,7 @@ class XStore {
    * 2. dispatch({type, payload})
    */
   dispatch(_type, _payload, _options) {
-    const { type, payload } = Helpers.unifyObjectStyle(_type, _payload, _options);
+    const { type, payload } = unifyObjectStyle(_type, _payload, _options);
     return this._actions[type] && this._actions[type](this, payload);
   }
 }
@@ -127,14 +121,24 @@ function install(_Vue) {
       const store = options.store;
       if (store) {
         // 组件内部设定了store,则优先使用组件内部的store
-        this.$store = typeof store === 'function' ? store() : store;
+        Vue.prototype.$store = typeof store === 'function' ? store() : store;
       } else if (options.parent && options.parent.$store) {
         // 组件内部没有设定store,则从根App.vue下继承$store方法
-        this.$store = options.parent.$store;
+        Vue.prototype.$store = options.parent.$store;
       }
     }
   });
 }
+
+function unifyObjectStyle(type, payload, options) {
+  if (isObject(type) && type.type) {
+    options = payload;
+    payload = type;
+    type = type.type;
+  }
+  return { type, payload, options };
+}
+
 /**
  *
  * @param {object} options
@@ -158,7 +162,7 @@ function mapState(options) {
         return this.$store.state[key];
       };
     });
-  } else if (Utils.isObject(options)) {
+  } else if (isObject(options)) {
     // object
     Object.keys(options).forEach(key => {
       // 为了this指向当前组件实例，这里不能用箭头函数。
@@ -182,7 +186,7 @@ function mapFuncWrap(func) {
     let opts = {};
     if (Array.isArray(options)) {
       options.forEach(t => (opts[t] = t));
-    } else if (Utils.isObject(options)) {
+    } else if (isObject(options)) {
       opts = { ...options };
     }
     Object.keys(opts).forEach(type => {
@@ -234,5 +238,7 @@ export { mapState, mapMutations, mapActions };
 export default {
   Store: XStore,
   install,
-  mapState
+  mapState,
+  mapMutations,
+  mapActions
 };

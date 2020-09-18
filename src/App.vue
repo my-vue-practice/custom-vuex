@@ -24,13 +24,13 @@
     <hr />
     <h3>module A</h3>
     <button @click="$store.commit('moduleA/add', 1)">moduleA add +1</button>
-    <p>moduleA.count: {{ $store.state.moduleA.count }}</p>
+    <!-- <p>moduleA.count: {{ $store.state.moduleA.count }}</p> -->
   </div>
 </template>
 
 <script>
 // import { mapState, mapMutations, mapActions } from 'vuex';
-import { mapState, mapMutations, mapActions } from './xstore/xvuex';
+import { mapState, mapMutations, mapActions } from './x-vuex';
 export default {
   name: 'App',
   data() {
